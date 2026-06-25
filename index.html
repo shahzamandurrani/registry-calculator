@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pakistan Registry Fee Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #F0D080;
+    --gold-dim: #8A6D2E;
+    --emerald: #1A6B4A;
+    --emerald-light: #2E9E70;
+    --cream: #FBF7EE;
+    --ink: #1A1612;
+    --ink2: #3D352A;
+    --ink3: #6B5F50;
+    --surface: #FFFFFF;
+    --surface2: #F5F0E8;
+    --surface3: #EDE6D8;
+    --border: rgba(201,168,76,0.25);
+    --border2: rgba(201,168,76,0.5);
+    --shadow: 0 4px 24px rgba(26,22,18,0.10);
+    --shadow-lg: 0 12px 48px rgba(26,22,18,0.16);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,168,76,0.12) 0%, transparent 70%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(201,168,76,0.04) 39px, rgba(201,168,76,0.04) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(201,168,76,0.04) 39px, rgba(201,168,76,0.04) 40px);
+  }
+
+  header {
+    background: linear-gradient(135deg, #1A2C1E 0%, #0F1F14 60%, #0D1A10 100%);
+    padding: 2.5rem 2rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 2px solid var(--gold);
+  }
+  header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(201,168,76,0.03) 20px, rgba(201,168,76,0.03) 21px);
+    pointer-events: none;
+  }
+  .header-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(201,168,76,0.15);
+    border: 1px solid rgba(201,168,76,0.4);
+    border-radius: 100px;
+    padding: 5px 16px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--gold-light); margin-bottom: 1rem;
+  }
+  .crescent { width: 14px; height: 14px; fill: var(--gold-light); }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 4vw, 2.6rem);
+    font-weight: 700; color: #fff; line-height: 1.2; margin-bottom: 0.5rem;
+  }
+  header h1 span { color: var(--gold-light); }
+  header p { font-size: 0.88rem; color: rgba(255,255,255,0.5); max-width: 480px; margin: 0 auto; line-height: 1.6; }
+
+  .container { max-width: 980px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+  /* TABS */
+  .tabs {
+    display: flex; gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 100px; padding: 5px;
+    margin-bottom: 2rem; box-shadow: var(--shadow);
+  }
+  .tab-btn {
+    flex: 1; padding: 10px 0; border: none; border-radius: 100px;
+    background: transparent; font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem; font-weight: 500; color: var(--ink3);
+    cursor: pointer; transition: all 0.25s ease; white-space: nowrap;
+  }
+  .tab-btn.active {
+    background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+    color: #fff; box-shadow: 0 2px 10px rgba(26,107,74,0.35);
+  }
+
+  /* GRID */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  @media (max-width: 680px) { .grid2 { grid-template-columns: 1fr; } }
+
+  /* CARD */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.5rem;
+    box-shadow: var(--shadow); transition: box-shadow 0.2s;
+  }
+  .card:hover { box-shadow: var(--shadow-lg); }
+  .card-full { grid-column: 1 / -1; }
+  .card-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 1.25rem; padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .card-icon svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; }
+  .card h2 { font-size: 0.95rem; font-weight: 600; color: var(--ink2); }
+
+  /* FIELD LABEL */
+  .field-label {
+    display: block; font-size: 0.75rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--ink3); margin-bottom: 7px; margin-top: 18px;
+  }
+  .field-label:first-child { margin-top: 0; }
+
+  /* INPUTS */
+  input[type="number"], select {
+    width: 100%; padding: 11px 14px;
+    border: 1.5px solid var(--border2); border-radius: var(--radius-sm);
+    background: var(--surface2); font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem; color: var(--ink); outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    -moz-appearance: textfield;
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+  input[type="number"]:focus, select:focus {
+    border-color: var(--gold); background: var(--surface);
+    box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
+  }
+  select { cursor: pointer; }
+  .prefix-wrap { position: relative; }
+  .prefix-wrap .pfx {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    font-size: 0.83rem; font-weight: 700; color: var(--ink3); pointer-events: none;
+  }
+  .prefix-wrap input { padding-left: 44px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* RADIO — Property Type */
+  .radio-group { display: flex; gap: 10px; margin-top: 4px; }
+  .radio-card { flex: 1; position: relative; }
+  .radio-card input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+  .radio-card label {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 10px; border: 2px solid var(--border2); border-radius: var(--radius-sm);
+    background: var(--surface2); cursor: pointer; font-size: 0.88rem; font-weight: 600;
+    color: var(--ink3); transition: all 0.2s; text-transform: none; letter-spacing: 0;
+    margin: 0; font-family: 'DM Sans', sans-serif;
+  }
+  .radio-card input[type="radio"]:checked + label {
+    border-color: var(--emerald); background: rgba(26,107,74,0.08);
+    color: var(--emerald); box-shadow: 0 0 0 3px rgba(26,107,74,0.12);
+  }
+  .radio-card label svg {
+    width: 18px; height: 18px; stroke: currentColor; fill: none;
+    stroke-width: 2; stroke-linecap: round; flex-shrink: 0;
+  }
+
+  /* SECTION DIVIDER */
+  .section-divider {
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.12em; color: var(--ink3);
+    margin: 20px 0 12px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* HOUSE EXTRA FIELDS */
+  .house-fields {
+    overflow: hidden; max-height: 0; opacity: 0;
+    transition: max-height 0.4s ease, opacity 0.3s ease;
+  }
+  .house-fields.visible { max-height: 300px; opacity: 1; }
+
+  /* CHECKBOX GROUPS */
+  .checkbox-group { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+  .cb-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 13px; border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm); cursor: pointer;
+    transition: all 0.18s; background: var(--surface2); user-select: none;
+  }
+  .cb-item:hover { border-color: var(--border2); background: var(--surface3); }
+  .cb-item input[type="checkbox"] { display: none; }
+  .cb-box {
+    width: 20px; height: 20px; border: 2px solid var(--border2);
+    border-radius: 5px; background: var(--surface); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; transition: all 0.18s;
+  }
+  .cb-box svg { width: 12px; height: 12px; stroke: #fff; fill: none; stroke-width: 3; opacity: 0; transition: opacity 0.15s; stroke-linecap: round; stroke-linejoin: round; }
+  .cb-item.checked { border-color: var(--emerald); background: rgba(26,107,74,0.06); }
+  .cb-item.checked .cb-box { background: var(--emerald); border-color: var(--emerald); }
+  .cb-item.checked .cb-box svg { opacity: 1; }
+  .cb-label { font-size: 0.88rem; font-weight: 500; color: var(--ink2); flex: 1; }
+  .cb-rate {
+    font-size: 0.75rem; font-weight: 700;
+    background: rgba(201,168,76,0.15); color: var(--gold-dim);
+    border-radius: 4px; padding: 2px 7px;
+  }
+
+  /* FIXED FEE PILLS — always-on items */
+  .fixed-fees {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px;
+  }
+  .fixed-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 13px;
+    background: rgba(26,107,74,0.07);
+    border: 1.5px solid rgba(26,107,74,0.2);
+    border-radius: 100px;
+    font-size: 0.8rem; font-weight: 600; color: var(--emerald);
+  }
+  .fixed-pill .pill-rate {
+    background: rgba(26,107,74,0.15); border-radius: 100px;
+    padding: 1px 7px; font-size: 0.72rem; font-weight: 700;
+  }
+  .fixed-pill svg { width: 13px; height: 13px; stroke: var(--emerald); fill: none; stroke-width: 2.5; stroke-linecap: round; }
+
+  /* RESULT PANEL */
+  .result-panel {
+    background: linear-gradient(135deg, #0F1F14 0%, #1A2C1E 100%);
+    border-radius: var(--radius); padding: 1.75rem; color: #fff;
+    position: relative; overflow: hidden; box-shadow: var(--shadow-lg);
+  }
+  .result-panel::before {
+    content: ''; position: absolute; top: -60px; right: -60px;
+    width: 200px; height: 200px; border-radius: 50%;
+    border: 40px solid rgba(201,168,76,0.08); pointer-events: none;
+  }
+  .result-panel::after {
+    content: ''; position: absolute; bottom: -40px; left: -40px;
+    width: 140px; height: 140px; border-radius: 50%;
+    border: 30px solid rgba(201,168,76,0.05); pointer-events: none;
+  }
+  .result-title {
+    font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase;
+    font-weight: 600; color: rgba(255,255,255,0.5); margin-bottom: 0.5rem;
+  }
+  .result-total {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3rem); font-weight: 700;
+    color: var(--gold-light); line-height: 1; margin-bottom: 1.5rem;
+  }
+  .result-total small {
+    font-size: 0.9rem; font-weight: 400; font-family: 'DM Sans', sans-serif;
+    color: rgba(255,255,255,0.4); margin-left: 6px;
+  }
+  .fee-breakdown { display: grid; gap: 0; }
+  .fee-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.07);
+    animation: fadeSlide 0.3s ease both;
+  }
+  .fee-row:last-child { border-bottom: none; }
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateX(-8px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .fee-row-label {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.84rem; color: rgba(255,255,255,0.7);
+  }
+  .fee-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .fee-row-amount { font-size: 0.9rem; font-weight: 600; color: #fff; white-space: nowrap; }
+  .fee-row-rate {
+    font-size: 0.7rem; color: var(--gold); font-weight: 500;
+    background: rgba(201,168,76,0.15); border-radius: 4px; padding: 1px 5px; margin-left: 4px;
+  }
+
+  /* DONUT */
+  .chart-wrap {
+    display: flex; align-items: center; gap: 1.25rem;
+    margin-top: 1.5rem; padding-top: 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .donut-svg { flex-shrink: 0; }
+  .legend { flex: 1; display: grid; gap: 7px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.76rem; color: rgba(255,255,255,0.65); }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .legend-pct { margin-left: auto; font-weight: 600; color: #fff; font-size: 0.8rem; }
+
+  /* ACTION BAR */
+  .action-bar {
+    display: flex; gap: 10px; margin-top: 1.25rem; padding-top: 1.25rem;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .action-btn {
+    flex: 1; padding: 9px 0; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.7);
+    font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .action-btn:hover { background: rgba(255,255,255,0.13); color: #fff; border-color: rgba(255,255,255,0.3); }
+  .action-btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+
+  /* RATES TABLE */
+  .rates-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .rates-table th {
+    background: var(--surface2); padding: 11px 14px; text-align: left;
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--ink3); border-bottom: 2px solid var(--border2);
+  }
+  .rates-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); color: var(--ink2); vertical-align: middle; }
+  .rates-table tr:last-child td { border-bottom: none; }
+  .rates-table tr:hover td { background: rgba(201,168,76,0.04); }
+  .badge { display: inline-block; padding: 3px 9px; border-radius: 100px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+  .badge-green { background: rgba(26,107,74,0.12); color: var(--emerald); }
+  .badge-gold { background: rgba(201,168,76,0.15); color: var(--gold-dim); }
+
+  /* HISTORY */
+  .history-empty { text-align: center; padding: 3rem 1rem; color: var(--ink3); }
+  .history-empty svg { width: 48px; height: 48px; stroke: var(--border2); margin-bottom: 1rem; fill: none; stroke-width: 1.5; }
+  .history-list { display: grid; gap: 10px; }
+  .history-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 16px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    transition: all 0.2s;
+  }
+  .history-item:hover { border-color: var(--gold); box-shadow: 0 2px 12px rgba(201,168,76,0.15); }
+  .history-meta { font-size: 0.78rem; color: var(--ink3); margin-top: 3px; }
+  .history-prop { font-size: 0.92rem; font-weight: 600; color: var(--ink2); }
+  .history-fee { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--emerald); white-space: nowrap; }
+  .del-btn { background: none; border: none; cursor: pointer; color: var(--ink3); padding: 4px; border-radius: 6px; transition: all 0.15s; flex-shrink: 0; }
+  .del-btn:hover { background: rgba(180,40,40,0.1); color: #9B2828; }
+
+  /* GUIDE */
+  .info-box {
+    background: rgba(26,107,74,0.07); border: 1px solid rgba(26,107,74,0.2);
+    border-left: 3px solid var(--emerald); border-radius: var(--radius-sm);
+    padding: 14px 16px; font-size: 0.88rem; color: var(--ink2); line-height: 1.6; margin-bottom: 1rem;
+  }
+  .info-box strong { color: var(--emerald); }
+  .section-label {
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.12em; color: var(--ink3); margin: 1.5rem 0 0.75rem;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .panel { animation: panelIn 0.3s ease; }
+  @keyframes panelIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .toast {
+    position: fixed; bottom: 30px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--ink); color: #fff;
+    padding: 10px 24px; border-radius: 100px; font-size: 0.85rem; font-weight: 500;
+    box-shadow: var(--shadow-lg); opacity: 0; pointer-events: none;
+    transition: all 0.3s ease; z-index: 999; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* placeholder state */
+  .placeholder-msg {
+    color: rgba(255,255,255,0.35); font-size: 0.85rem;
+    text-align: center; padding: 1.5rem 0; border: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-badge">
+    <svg class="crescent" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    Islamic Republic of Pakistan
+  </div>
+  <h1>Property <span>Registry</span> Fee Calculator</h1>
+  <p>Stamp Duty · TTip · Local Commission · Advance Tax (236K) · Gain Tax (236C) · PLRA</p>
+</header>
+
+<div class="container">
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" onclick="switchTab('calculator',this)">Calculator</button>
+    <button class="tab-btn" onclick="switchTab('rates',this)">Rate Chart</button>
+    <button class="tab-btn" onclick="switchTab('history',this)">History</button>
+    <button class="tab-btn" onclick="switchTab('guide',this)">Guide</button>
+  </div>
+
+  <!-- ===== CALCULATOR ===== -->
+  <div id="tab-calculator" class="panel">
+    <div class="grid2">
+
+      <!-- LEFT: FORM -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <h2>Property Details</h2>
+        </div>
+
+        <!-- Property Type -->
+        <span class="field-label" style="margin-top:0">Property Type</span>
+        <div class="radio-group">
+          <div class="radio-card">
+            <input type="radio" name="propType" id="typePlot" value="plot" checked onchange="onTypeChange()">
+            <label for="typePlot">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+              Plot
+            </label>
+          </div>
+          <div class="radio-card">
+            <input type="radio" name="propType" id="typeHouse" value="house" onchange="onTypeChange()">
+            <label for="typeHouse">
+              <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              House
+            </label>
+          </div>
+        </div>
+
+        <!-- Dimensions -->
+        <div class="section-divider">Property Dimensions</div>
+        <div class="row2">
+          <div>
+            <span class="field-label">Marla</span>
+            <input type="number" id="marla" placeholder="e.g. 10" min="0" oninput="liveCalc()">
+          </div>
+          <div>
+            <span class="field-label">Feet</span>
+            <input type="number" id="feet" placeholder="e.g. 272" min="0" oninput="liveCalc()">
+          </div>
+        </div>
+
+        <span class="field-label">Rate per Marla (PKR)</span>
+        <div class="prefix-wrap">
+          <span class="pfx">₨</span>
+          <input type="number" id="ratePerMarla" placeholder="e.g. 1,500,000" min="0" oninput="liveCalc()">
+        </div>
+
+        <!-- House-only fields -->
+        <div class="house-fields" id="houseFields">
+          <div class="section-divider">Construction Details</div>
+          <span class="field-label">Rate — Covered Area (PKR / sq.ft)</span>
+          <div class="prefix-wrap">
+            <span class="pfx">₨</span>
+            <input type="number" id="coveredAreaRate" placeholder="e.g. 3,500" min="0" oninput="liveCalc()">
+          </div>
+          <span class="field-label">Covered Area (sq. ft)</span>
+          <input type="number" id="coveredAreaSqft" placeholder="e.g. 2,200" min="0" oninput="liveCalc()">
+          <span class="field-label">House Map</span>
+          <select id="houseMap" onchange="liveCalc()">
+            <option value="approved">Approved / Regularised Map</option>
+            <option value="unapproved">Un-Approved Map</option>
+            <option value="na">Not Applicable</option>
+          </select>
+        </div>
+
+        <!-- Always-on fixed fees -->
+        <div class="section-divider">Fixed Charges (Always Included)</div>
+        <div class="fixed-fees">
+          <div class="fixed-pill">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            Stamp Duty (City) <span class="pill-rate">1%</span>
+          </div>
+          <div class="fixed-pill">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            TTip <span class="pill-rate">1%</span>
+          </div>
+          <div class="fixed-pill">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            Local Commission <span class="pill-rate">₨15,000</span>
+          </div>
+          <div class="fixed-pill">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            PLRA Fee <span class="pill-rate">max(₨3,300 / 0.01%)</span>
+          </div>
+          <div class="fixed-pill">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            Stamp Registration <span class="pill-rate">₨1,000</span>
+          </div>
+        </div>
+
+        <!-- Advance Tax (Purchaser) -->
+        <div class="section-divider">Advance Tax — Purchaser (236K)</div>
+        <div class="checkbox-group">
+          <div class="cb-item exclusive-buyer" id="cb-buyer-filer" onclick="exclusiveCb('buyer',this,'filer')">
+            <input type="checkbox">
+            <div class="cb-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+            <span class="cb-label">Filer</span>
+            <span class="cb-rate">1.5%</span>
+          </div>
+          <div class="cb-item exclusive-buyer" id="cb-buyer-late" onclick="exclusiveCb('buyer',this,'late')">
+            <input type="checkbox">
+            <div class="cb-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+            <span class="cb-label">Late Filer</span>
+            <span class="cb-rate">4.5%</span>
+          </div>
+          <div class="cb-item exclusive-buyer" id="cb-buyer-nonfiler" onclick="exclusiveCb('buyer',this,'nonfiler')">
+            <input type="checkbox">
+            <div class="cb-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+            <span class="cb-label">Non Filer</span>
+            <span class="cb-rate">10.5%</span>
+          </div>
+        </div>
+
+        <!-- Gain Tax (Seller) -->
+        <div class="section-divider">Gain Tax — Seller (236C)</div>
+        <div class="checkbox-group">
+          <div class="cb-item exclusive-seller" id="cb-seller-filer" onclick="exclusiveCb('seller',this,'filer')">
+            <input type="checkbox">
+            <div class="cb-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+            <span class="cb-label">Filer</span>
+            <span class="cb-rate">4.5%</span>
+          </div>
+          <div class="cb-item exclusive-seller" id="cb-seller-late" onclick="exclusiveCb('seller',this,'late')">
+            <input type="checkbox">
+            <div class="cb-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+            <span class="cb-label">Late Filer</span>
+            <span class="cb-rate">7.5%</span>
+          </div>
+          <div class="cb-item exclusive-seller" id="cb-seller-nonfiler" onclick="exclusiveCb('seller',this,'nonfiler')">
+            <input type="checkbox">
+            <div class="cb-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+            <span class="cb-label">Non Filer</span>
+            <span class="cb-rate">10.5%</span>
+          </div>
+        </div>
+
+      </div><!-- end left card -->
+
+      <!-- RIGHT: RESULTS -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <h2>Fee Breakdown</h2>
+        </div>
+
+        <div class="result-panel">
+          <div class="result-title">Total Registry Cost</div>
+          <div class="result-total" id="totalDisplay">₨ — <small>PKR</small></div>
+
+          <div class="fee-breakdown" id="feeBreakdown">
+            <div class="placeholder-msg">Enter property value to see live results</div>
+          </div>
+
+          <div id="chartSection" style="display:none">
+            <div class="chart-wrap">
+              <svg class="donut-svg" id="donutSvg" width="100" height="100" viewBox="0 0 100 100"></svg>
+              <div class="legend" id="donutLegend"></div>
+            </div>
+          </div>
+
+          <div class="action-bar">
+            <button class="action-btn" onclick="saveHistory()">
+              <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Save
+            </button>
+            <button class="action-btn" onclick="copyResult()">
+              <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy
+            </button>
+            <button class="action-btn" onclick="printResult()">
+              <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              Print
+            </button>
+          </div>
+        </div>
+      </div><!-- end right card -->
+
+    </div>
+  </div>
+
+  <!-- ===== RATES TAB ===== -->
+  <div id="tab-rates" class="panel" style="display:none">
+    <div class="card card-full">
+      <div class="card-header">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        </div>
+        <h2>Official Rate Chart — Pakistan</h2>
+      </div>
+      <div class="info-box">
+        <strong>Source:</strong> FBR Income Tax Ordinance 2001 (§236C &amp; §236K), Punjab Stamp Act, PLRA regulations. Rates effective FY 2024–25.
+      </div>
+      <table class="rates-table">
+        <thead>
+          <tr><th>Fee Type</th><th>Filer</th><th>Late Filer</th><th>Non-Filer</th><th>Paid By</th><th>Nature</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Stamp Duty (City)</strong></td><td>1%</td><td>1%</td><td>1%</td><td>Buyer</td><td><span class="badge badge-green">Fixed</span></td></tr>
+          <tr><td><strong>TTip (Town Tax)</strong></td><td>1%</td><td>1%</td><td>1%</td><td>Buyer</td><td><span class="badge badge-green">Fixed</span></td></tr>
+          <tr><td><strong>Local Commission</strong></td><td>₨15,000</td><td>₨15,000</td><td>₨15,000</td><td>Both</td><td><span class="badge badge-green">Fixed</span></td></tr>
+          <tr><td><strong>Advance Tax 236K (Buyer)</strong></td><td>1.5%</td><td>4.5%</td><td>10.5%</td><td>Buyer</td><td><span class="badge badge-gold">Variable</span></td></tr>
+          <tr><td><strong>Gain Tax 236C (Seller)</strong></td><td>4.5%</td><td>7.5%</td><td>10.5%</td><td>Seller</td><td><span class="badge badge-gold">Variable</span></td></tr>
+          <tr><td><strong>PLRA Fee</strong></td><td colspan="3">max(₨3,300 or 0.01% of value)</td><td>Buyer</td><td><span class="badge badge-green">Min Fixed</span></td></tr>
+          <tr><td><strong>Stamp Registration Fee</strong></td><td colspan="3">₨1,000 Fixed</td><td>Buyer</td><td><span class="badge badge-green">Fixed</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== HISTORY TAB ===== -->
+  <div id="tab-history" class="panel" style="display:none">
+    <div class="card card-full">
+      <div class="card-header">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <h2>Calculation History</h2>
+      </div>
+      <div id="historyContent">
+        <div class="history-empty">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <p>No saved calculations yet. Run a calculation and tap Save.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== GUIDE TAB ===== -->
+  <div id="tab-guide" class="panel" style="display:none">
+    <div class="card card-full">
+      <div class="card-header">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <h2>Registry Process Guide</h2>
+      </div>
+      <div class="info-box">
+        <strong>FBR Active Taxpayer List (ATL):</strong> Your filer status determines the withholding tax rate. Check status at fbr.gov.pk. Being a Filer can save you 6–9% in taxes.
+      </div>
+      <div class="section-label">Key Terms</div>
+      <table class="rates-table">
+        <thead><tr><th>Term</th><th>Full Form</th><th>Explanation</th></tr></thead>
+        <tbody>
+          <tr><td><strong>236K</strong></td><td>Advance Tax (Buyer)</td><td>Withholding tax paid by purchaser on property acquisition</td></tr>
+          <tr><td><strong>236C</strong></td><td>Gain Tax (Seller)</td><td>Withholding tax deducted from seller on property transfer</td></tr>
+          <tr><td><strong>TTip</strong></td><td>Town Tax / Transfer Tax</td><td>Municipal body tax on property transfer, fixed at 1%</td></tr>
+          <tr><td><strong>PLRA</strong></td><td>Punjab Land Record Authority</td><td>Official registry body; charges max(₨3,300 or 0.01%)</td></tr>
+          <tr><td><strong>Local Commission</strong></td><td>—</td><td>Fixed ₨15,000 fee charged at time of registry</td></tr>
+          <tr><td><strong>Filer</strong></td><td>ATL Taxpayer</td><td>Filed income tax return on time; qualifies for lowest rates</td></tr>
+          <tr><td><strong>Late Filer</strong></td><td>—</td><td>Filed after deadline; intermediate tax rates apply</td></tr>
+          <tr><td><strong>Non-Filer</strong></td><td>—</td><td>Has not filed a return; highest withholding rates apply</td></tr>
+        </tbody>
+      </table>
+      <div class="section-label" style="margin-top:1.75rem">Step-by-Step Process</div>
+      <div style="display:grid;gap:10px;margin-top:0.5rem">
+        <div class="info-box"><strong>Step 1 — Verify FBR ATL Status</strong><br>Both buyer and seller must check their ATL status on fbr.gov.pk to confirm applicable tax rates before proceeding.</div>
+        <div class="info-box"><strong>Step 2 — Agree on Declared Value</strong><br>Fees are calculated on the higher of DC rate or agreed market value. Undervaluation carries legal risk.</div>
+        <div class="info-box"><strong>Step 3 — Pay Challan (PSID)</strong><br>Fees are deposited via PSID at any designated bank branch. Obtain payment receipt before your registry appointment.</div>
+        <div class="info-box"><strong>Step 4 — Attend PLRA Arzi Centre</strong><br>Visit your local Tehsil office or PLRA Arzi Centre with CNIC, challans, title documents, and both parties present.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DOTS = ['#C9A84C','#4A90D9','#1A6B4A','#2E9E70','#8A6D2E','#E5B55A','#B85C38','#9B59B6'];
+
+let selectedBuyer = null;
+let selectedSeller = null;
+let lastResult = null;
+let history = JSON.parse(localStorage.getItem('reg_history3') || '[]');
+
+/* ── TABS ── */
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ['calculator','rates','history','guide'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = t === name ? '' : 'none';
+  });
+  if (name === 'history') renderHistory();
+}
+
+/* ── PROPERTY TYPE ── */
+function onTypeChange() {
+  const isHouse = document.getElementById('typeHouse').checked;
+  document.getElementById('houseFields').classList.toggle('visible', isHouse);
+  liveCalc();
+}
+
+/* ── EXCLUSIVE CHECKBOXES ── */
+function exclusiveCb(role, el, val) {
+  const cls = role === 'buyer' ? '.exclusive-buyer' : '.exclusive-seller';
+  const current = role === 'buyer' ? selectedBuyer : selectedSeller;
+  // clicking same one deselects
+  document.querySelectorAll(cls).forEach(c => c.classList.remove('checked'));
+  if (current === val) {
+    if (role === 'buyer') selectedBuyer = null;
+    else selectedSeller = null;
+  } else {
+    el.classList.add('checked');
+    if (role === 'buyer') selectedBuyer = val;
+    else selectedSeller = val;
+  }
+  liveCalc();
+}
+
+/* ── PROPERTY VALUE ── */
+function getPropertyValue() {
+  const marla = parseFloat(document.getElementById('marla').value) || 0;
+  const ratePerMarla = parseFloat(document.getElementById('ratePerMarla').value) || 0;
+  const isHouse = document.getElementById('typeHouse').checked;
+  let val = marla * ratePerMarla;
+  if (isHouse) {
+    const cRate = parseFloat(document.getElementById('coveredAreaRate').value) || 0;
+    const cSqft = parseFloat(document.getElementById('coveredAreaSqft').value) || 0;
+    val += cRate * cSqft;
+  }
+  return val;
+}
+
+/* ── LIVE CALC ── */
+function liveCalc() {
+  const val = getPropertyValue();
+  if (val > 0) calculate(val);
+  else resetOutput();
+}
+
+function resetOutput() {
+  document.getElementById('totalDisplay').innerHTML = '₨ — <small>PKR</small>';
+  document.getElementById('feeBreakdown').innerHTML = '<div class="placeholder-msg">Enter property value to see live results</div>';
+  document.getElementById('chartSection').style.display = 'none';
+  lastResult = null;
+}
+
+/* ── CALCULATE ── */
+function calculate(val) {
+  const fees = [];
+
+  // Always-on fixed fees
+  fees.push({ label: 'Stamp Duty (City)',     rate: '1%',         amount: val * 0.01,              dot: DOTS[0] });
+  fees.push({ label: 'TTip (Town Tax)',        rate: '1%',         amount: val * 0.01,              dot: DOTS[1] });
+  fees.push({ label: 'Local Commission',       rate: 'Fixed',      amount: 15000,                   dot: DOTS[2] });
+
+  const plraComputed = val * 0.0001;
+  fees.push({ label: 'PLRA Fee',               rate: 'max(₨3,300 / 0.01%)', amount: Math.max(3300, plraComputed), dot: DOTS[3] });
+  fees.push({ label: 'Stamp Registration Fee', rate: 'Fixed',      amount: 1000,                    dot: DOTS[4] });
+
+  // Buyer Advance Tax 236K
+  const buyerRates = { filer: 0.015, late: 0.045, nonfiler: 0.105 };
+  const buyerRateLabels = { filer: '1.5%', late: '4.5%', nonfiler: '10.5%' };
+  const buyerNames = { filer: 'Filer', late: 'Late Filer', nonfiler: 'Non Filer' };
+  if (selectedBuyer) {
+    fees.push({ label: `Advance Tax 236K (${buyerNames[selectedBuyer]})`, rate: buyerRateLabels[selectedBuyer], amount: val * buyerRates[selectedBuyer], dot: DOTS[5] });
+  }
+
+  // Seller Gain Tax 236C
+  const sellerRates = { filer: 0.045, late: 0.075, nonfiler: 0.105 };
+  const sellerRateLabels = { filer: '4.5%', late: '7.5%', nonfiler: '10.5%' };
+  const sellerNames = { filer: 'Filer', late: 'Late Filer', nonfiler: 'Non Filer' };
+  if (selectedSeller) {
+    fees.push({ label: `Gain Tax 236C (${sellerNames[selectedSeller]})`, rate: sellerRateLabels[selectedSeller], amount: val * sellerRates[selectedSeller], dot: DOTS[6] });
+  }
+
+  const total = fees.reduce((s, f) => s + f.amount, 0);
+  lastResult = { val, total, fees, propType: document.getElementById('typeHouse').checked ? 'House' : 'Plot' };
+
+  document.getElementById('totalDisplay').innerHTML = `₨ ${fmt(total)} <small>PKR</small>`;
+  document.getElementById('feeBreakdown').innerHTML = fees.map((f, i) => `
+    <div class="fee-row" style="animation-delay:${i * 0.04}s">
+      <div class="fee-row-label">
+        <span class="fee-dot" style="background:${f.dot}"></span>
+        ${f.label}
+        <span class="fee-row-rate">${f.rate}</span>
+      </div>
+      <div class="fee-row-amount">₨ ${fmt(f.amount)}</div>
+    </div>
+  `).join('');
+
+  drawDonut(fees, total);
+  document.getElementById('chartSection').style.display = '';
+}
+
+function fmt(n) { return Math.round(n).toLocaleString('en-PK'); }
+
+function drawDonut(fees, total) {
+  const cx=50, cy=50, r=38, sw=14;
+  const c = 2 * Math.PI * r;
+  let off = 0, paths = '';
+  fees.forEach(f => {
+    const d = (f.amount / total) * c;
+    paths += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${f.dot}" stroke-width="${sw}" stroke-dasharray="${d.toFixed(2)} ${(c-d).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 ${cx} ${cy})"/>`;
+    off += d;
+  });
+  document.getElementById('donutSvg').innerHTML = paths;
+  document.getElementById('donutLegend').innerHTML = fees.map(f => `
+    <div class="legend-item">
+      <span class="legend-swatch" style="background:${f.dot}"></span>
+      <span>${f.label.split('(')[0].trim()}</span>
+      <span class="legend-pct">${((f.amount / total) * 100).toFixed(1)}%</span>
+    </div>
+  `).join('');
+}
+
+/* ── HISTORY ── */
+function saveHistory() {
+  if (!lastResult) { showToast('Enter a property value first'); return; }
+  const entry = {
+    id: Date.now(),
+    date: new Date().toLocaleDateString('en-PK'),
+    propType: lastResult.propType,
+    propValue: lastResult.val,
+    total: lastResult.total,
+  };
+  history.unshift(entry);
+  if (history.length > 20) history.pop();
+  localStorage.setItem('reg_history3', JSON.stringify(history));
+  showToast('Saved to history ✓');
+}
+
+function renderHistory() {
+  const cont = document.getElementById('historyContent');
+  if (!history.length) {
+    cont.innerHTML = `<div class="history-empty"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><p>No saved calculations yet.</p></div>`;
+    return;
+  }
+  cont.innerHTML = `<div class="history-list">${history.map(h => `
+    <div class="history-item">
+      <div>
+        <div class="history-prop">${h.propType} · ₨ ${fmt(h.propValue)}</div>
+        <div class="history-meta">${h.date}</div>
+      </div>
+      <div class="history-fee">₨ ${fmt(h.total)}</div>
+      <button class="del-btn" onclick="deleteHistory(event,'${h.id}')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </button>
+    </div>
+  `).join('')}</div>`;
+}
+
+function deleteHistory(e, id) {
+  e.stopPropagation();
+  history = history.filter(h => h.id != id);
+  localStorage.setItem('reg_history3', JSON.stringify(history));
+  renderHistory();
+}
+
+function copyResult() {
+  if (!lastResult) { showToast('Nothing to copy yet'); return; }
+  const lines = [
+    `Pakistan Registry Fees — ${new Date().toLocaleDateString('en-PK')}`,
+    `Property Value: ₨ ${fmt(lastResult.val)}`,
+    '─────────────────────────',
+    ...lastResult.fees.map(f => `${f.label} (${f.rate}): ₨ ${fmt(f.amount)}`),
+    '─────────────────────────',
+    `Total: ₨ ${fmt(lastResult.total)}`
+  ].join('\n');
+  navigator.clipboard.writeText(lines).then(() => showToast('Copied to clipboard ✓'));
+}
+
+function printResult() { window.print(); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
