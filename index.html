@@ -480,7 +480,7 @@
           </div>
           <div class="fixed-pill">
             <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-            PLRA Fee <span class="pill-rate">max(₨3,300 / 0.01%)</span>
+            PLRA Fee <span class="pill-rate">0.01% (capped at ₨3,300)</span>
           </div>
           <div class="fixed-pill">
             <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
@@ -602,7 +602,7 @@
           <tr><td><strong>Local Commission</strong></td><td>₨15,000</td><td>₨15,000</td><td>₨15,000</td><td>Both</td><td><span class="badge badge-green">Fixed</span></td></tr>
           <tr><td><strong>Advance Tax 236K (Buyer)</strong></td><td>1.5%</td><td>4.5%</td><td>10.5%</td><td>Buyer</td><td><span class="badge badge-gold">Variable</span></td></tr>
           <tr><td><strong>Gain Tax 236C (Seller)</strong></td><td>4.5%</td><td>7.5%</td><td>10.5%</td><td>Seller</td><td><span class="badge badge-gold">Variable</span></td></tr>
-          <tr><td><strong>PLRA Fee</strong></td><td colspan="3">max(₨3,300 or 0.01% of value)</td><td>Buyer</td><td><span class="badge badge-green">Min Fixed</span></td></tr>
+          <tr><td><strong>PLRA Fee</strong></td><td colspan="3">0.01% of value, capped at ₨3,300</td><td>Buyer</td><td><span class="badge badge-green">Capped</span></td></tr>
           <tr><td><strong>Stamp Registration Fee</strong></td><td colspan="3">₨1,000 Fixed</td><td>Buyer</td><td><span class="badge badge-green">Fixed</span></td></tr>
         </tbody>
       </table>
@@ -646,7 +646,7 @@
           <tr><td><strong>236K</strong></td><td>Advance Tax (Buyer)</td><td>Withholding tax paid by purchaser on property acquisition</td></tr>
           <tr><td><strong>236C</strong></td><td>Gain Tax (Seller)</td><td>Withholding tax deducted from seller on property transfer</td></tr>
           <tr><td><strong>TTip</strong></td><td>Town Tax / Transfer Tax</td><td>Municipal body tax on property transfer, fixed at 1%</td></tr>
-          <tr><td><strong>PLRA</strong></td><td>Punjab Land Record Authority</td><td>Official registry body; charges max(₨3,300 or 0.01%)</td></tr>
+          <tr><td><strong>PLRA</strong></td><td>Punjab Land Record Authority</td><td>Official registry body; fee is 0.01% of value, capped at ₨3,300</td></tr>
           <tr><td><strong>Local Commission</strong></td><td>—</td><td>Fixed ₨15,000 fee charged at time of registry</td></tr>
           <tr><td><strong>Filer</strong></td><td>ATL Taxpayer</td><td>Filed income tax return on time; qualifies for lowest rates</td></tr>
           <tr><td><strong>Late Filer</strong></td><td>—</td><td>Filed after deadline; intermediate tax rates apply</td></tr>
@@ -747,7 +747,8 @@ function calculate(val) {
   fees.push({ label: 'Local Commission',       rate: 'Fixed',      amount: 15000,                   dot: DOTS[2] });
 
   const plraComputed = val * 0.0001;
-  fees.push({ label: 'PLRA Fee',               rate: 'max(₨3,300 / 0.01%)', amount: Math.max(3300, plraComputed), dot: DOTS[3] });
+  const plraAmount = plraComputed > 3300 ? 3300 : plraComputed;
+  fees.push({ label: 'PLRA Fee',               rate: '0.01% (capped at ₨3,300)', amount: plraAmount, dot: DOTS[3] });
   fees.push({ label: 'Stamp Registration Fee', rate: 'Fixed',      amount: 1000,                    dot: DOTS[4] });
 
   // Buyer Advance Tax 236K
