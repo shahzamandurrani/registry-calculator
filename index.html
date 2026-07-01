@@ -495,7 +495,7 @@
             <input type="checkbox">
             <div class="cb-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
             <span class="cb-label">Filer</span>
-            <span class="cb-rate">1.5%</span>
+            <span class="cb-rate">1.25%</span>
           </div>
       
           <div class="cb-item exclusive-buyer" id="cb-buyer-nonfiler" onclick="exclusiveCb('buyer',this,'nonfiler')">
@@ -513,7 +513,7 @@
             <input type="checkbox">
             <div class="cb-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
             <span class="cb-label">Filer</span>
-            <span class="cb-rate">4.5%</span>
+            <span class="cb-rate">2.75%</span>
           </div>
       
           <div class="cb-item exclusive-seller" id="cb-seller-nonfiler" onclick="exclusiveCb('seller',this,'nonfiler')">
@@ -742,17 +742,17 @@ function calculate(val) {
   fees.push({ label: 'Stamp Registration Fee', rate: 'Fixed',      amount: 1000,                    dot: DOTS[4] });
 
   // Buyer Advance Tax 236K
-  const buyerRates = { filer: 0.015, late: 0.045, nonfiler: 0.105 };
-  const buyerRateLabels = { filer: '1.5%', late: '4.5%', nonfiler: '10.5%' };
-  const buyerNames = { filer: 'Filer', late: 'Late Filer', nonfiler: 'Non Filer' };
+  const buyerRates = { filer: 0.0125, nonfiler: 0.105 };
+  const buyerRateLabels = { filer: '1.25%', nonfiler: '10.5%' };
+  const buyerNames = { filer: 'Filer', nonfiler: 'Non Filer' };
   if (selectedBuyer) {
     fees.push({ label: `Advance Tax 236K (${buyerNames[selectedBuyer]})`, rate: buyerRateLabels[selectedBuyer], amount: val * buyerRates[selectedBuyer], dot: DOTS[5] });
   }
 
   // Seller Gain Tax 236C
-  const sellerRates = { filer: 0.045, late: 0.075, nonfiler: 0.105 };
-  const sellerRateLabels = { filer: '4.5%', late: '7.5%', nonfiler: '10.5%' };
-  const sellerNames = { filer: 'Filer', late: 'Late Filer', nonfiler: 'Non Filer' };
+  const sellerRates = { filer: 0.0275, nonfiler: 0.105 };
+  const sellerRateLabels = { filer: '2.75%', nonfiler: '10.5%' };
+  const sellerNames = { filer: 'Filer', nonfiler: 'Non Filer' };
   if (selectedSeller) {
     fees.push({ label: `Gain Tax 236C (${sellerNames[selectedSeller]})`, rate: sellerRateLabels[selectedSeller], amount: val * sellerRates[selectedSeller], dot: DOTS[6] });
   }
