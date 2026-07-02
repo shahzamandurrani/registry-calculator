@@ -502,7 +502,7 @@
             <input type="checkbox">
             <div class="cb-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
             <span class="cb-label">Non Filer</span>
-            <span class="cb-rate">10.5%</span>
+            <span class="cb-rate">2.5%</span>
           </div>
         </div>
 
@@ -520,7 +520,7 @@
             <input type="checkbox">
             <div class="cb-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
             <span class="cb-label">Non Filer</span>
-            <span class="cb-rate">10.5%</span>
+            <span class="cb-rate">5.5%</span>
           </div>
         </div>
 
@@ -742,16 +742,16 @@ function calculate(val) {
   fees.push({ label: 'Stamp Registration Fee', rate: 'Fixed',      amount: 1000,                    dot: DOTS[4] });
 
   // Buyer Advance Tax 236K
-  const buyerRates = { filer: 0.0125, nonfiler: 0.105 };
-  const buyerRateLabels = { filer: '1.25%', nonfiler: '10.5%' };
+  const buyerRates = { filer: 0.0125, nonfiler: 0.025 };
+  const buyerRateLabels = { filer: '1.25%', nonfiler: '2.5%' };
   const buyerNames = { filer: 'Filer', nonfiler: 'Non Filer' };
   if (selectedBuyer) {
     fees.push({ label: `Advance Tax 236K (${buyerNames[selectedBuyer]})`, rate: buyerRateLabels[selectedBuyer], amount: val * buyerRates[selectedBuyer], dot: DOTS[5] });
   }
 
   // Seller Gain Tax 236C
-  const sellerRates = { filer: 0.0275, nonfiler: 0.105 };
-  const sellerRateLabels = { filer: '2.75%', nonfiler: '10.5%' };
+  const sellerRates = { filer: 0.0275, nonfiler: 0.055 };
+  const sellerRateLabels = { filer: '2.75%', nonfiler: '5.5%' };
   const sellerNames = { filer: 'Filer', nonfiler: 'Non Filer' };
   if (selectedSeller) {
     fees.push({ label: `Gain Tax 236C (${sellerNames[selectedSeller]})`, rate: sellerRateLabels[selectedSeller], amount: val * sellerRates[selectedSeller], dot: DOTS[6] });
